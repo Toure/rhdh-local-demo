@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.vmName }}
+  description: RHEL 9 Virtual Machine
+  annotations:
+    # IMPORTANT: This matches the label we usually put on the VM
+    # to let RHDH find it (if using label selector) or just name matching
+    backstage.io/kubernetes-id: ${{ values.vmName }}
+spec:
+  type: infrastructure
+  lifecycle: production
+  owner: user:guest
+  dependsOn:
+    - resource:default/openshift-virt

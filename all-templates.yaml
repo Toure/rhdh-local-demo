@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: demo-templates-collection
+  description: A collection of templates for the Client Demo
+spec:
+  targets:
+    - ./templates/postgres/template.yaml
+    - ./templates/vm/template.yaml
+    - ./templates/cicd/template.yaml
+  type: url

@@ -1,0 +1,85 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: ci-cd-demo
+  title: Hello World CI/CD Service
+  description: Scaffolds a Node.js service with a pre-configured GitHub Actions pipeline.
+  tags: ["nodejs", "github-actions", "cicd", "demo"]
+spec:
+  owner: user:guest
+  type: service
+
+  # 1. INPUT FORM
+  parameters:
+    - title: Service Information
+      required:
+        - name
+        - owner
+      properties:
+        name:
+          title: Service Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          default: my-cicd-service
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          default: user:guest
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+
+    - title: Repository Location
+      required:
+        - repoOwner
+        - repoName
+      properties:
+        repoOwner:
+          title: Repository Owner (Org or User)
+          type: string
+          description: The GitHub organization or username
+        repoName:
+          title: Repository Name
+          type: string
+          description: The name of the repository to create
+
+  # 2. EXECUTION STEPS
+  steps:
+    - id: fetch-base
+      name: Fetch Skeleton Code
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+          destination: ${{ parameters.repoOwner }}/${{ parameters.repoName }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: This is ${{ parameters.name }} with CI/CD
+        repoUrl: github.com?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
+        defaultBranch: main
+        access: public # Use 'private' if your token has repo access to private repos
+
+    - id: register
+      name: Register in Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"
+
+  # 3. OUTPUT LINKS
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

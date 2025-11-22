@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: PostgreSQL Database Instance
+  annotations:
+    # This helps RHDH find the resources in the cluster
+    backstage.io/kubernetes-id: ${{ values.name }}
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: database
+  lifecycle: production
+  owner: user:guest

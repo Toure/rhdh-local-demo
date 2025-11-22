@@ -1,0 +1,43 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-rhel-vm
+  title: Provision RHEL VM
+  description: Creates a RHEL 9 Virtual Machine on OpenShift Virtualization
+  tags: ["vm", "rhel", "virt"]
+spec:
+  owner: user:guest
+  type: infrastructure
+  parameters:
+    - title: VM Details
+      properties:
+        vmName:
+          title: VM Name
+          type: string
+          default: demo-rhel-vm
+        cores:
+          title: CPU Cores
+          type: number
+          default: 2
+        memory:
+          title: Memory (Gi)
+          type: number
+          default: 4
+  steps:
+    - id: render-vm-manifest
+      name: Render VM Manifest
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          vmName: ${{ parameters.vmName }}
+          cores: ${{ parameters.cores }}
+          memory: ${{ parameters.memory }}
+
+    - id: publish
+      name: Publish GitOps Config
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        repoUrl: github.com?owner=<YOUR_GITHUB_USER>&repo=${{ parameters.vmName }}-config
+        defaultBranch: main

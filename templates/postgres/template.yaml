@@ -1,0 +1,47 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-postgres-db
+  title: Create PostgreSQL Database
+  description: Deploys a PostgreSQL instance to OpenShift
+  tags: ["database", "postgresql", "openshift"]
+spec:
+  owner: user:guest
+  type: service
+  parameters:
+    - title: Database Configuration
+      required:
+        - name
+        - namespace
+      properties:
+        name:
+          title: Database Name
+          type: string
+          default: my-postgres
+        namespace:
+          title: Target Namespace
+          type: string
+          default: rhdh-demo
+  steps:
+    - id: fetch-base
+      name: Fetch Base Config
+      action: fetch:template
+      input:
+        url: ./content # Point this to a subfolder with deployment.yaml
+        values:
+          name: ${{ parameters.name }}
+          namespace: ${{ parameters.namespace }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: This is ${{ parameters.name }} config
+        repoUrl: github.com?owner=<YOUR_GITHUB_USER>&repo=${{ parameters.name }}-ops
+        defaultBranch: main
+
+  output:
+    links:
+      - title: Source Code
+        url: ${{ steps.publish.output.remoteUrl }}

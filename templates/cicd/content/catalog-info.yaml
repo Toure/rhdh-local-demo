@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: A demo service with CI/CD
+  annotations:
+    # This connects the CI/CD tab to the repo
+    github.com/project-slug: ${{ values.destination }}
+    # This connects the "Source" sidebar item
+    backstage.io/source-location: url:${{ values.repoUrl }}
+spec:
+  type: service
+  owner: ${{ values.owner }}
+  lifecycle: experimental

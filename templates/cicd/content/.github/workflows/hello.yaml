@@ -1,0 +1,20 @@
+name: Demo Build Pipeline
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Print Hello World
+        run: echo "Building ${{ values.name }}... Success!"
+
+      - name: Run Tests
+        run: |
+          echo "Running unit tests..."
+          sleep 2 # Fake a delay so the client sees the spinner in RHDH
+          echo "Tests Passed!"
